@@ -130,7 +130,7 @@ pipeline {
 
   post {
     success {
-      echo "Build ${env.VERSION} deployed successfully."
+      echo "Build ${env.VERSION} deployed successfully and Jenkins done."
     }
     failure {
       echo "Pipeline failed. Check the logs above."
