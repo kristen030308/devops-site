@@ -47,7 +47,7 @@ Run:
 > docker build -t devops .
 
 Run:
-> docker run --name devops-site -p 5000:5000 devops:latest
+> docker run -it --name devops-site -p 5000:5000 devops:latest
 
 5. Push the image to the dockerHub
 
@@ -55,14 +55,14 @@ Run:
 > docker login
 
 Run:
-> docker tag devops:v1 <docker-hub-username>/devops:latest
+> docker tag devops:latest <docker-hub-username>/devops:latest
 
 Run:
 > docker push <docker-hub-username>/devops:latest
 
 6. jenkinsfile
 
-Go to jenkins manage and select the configuration, add the docker cradentials. **Note: Id = DOCKERHUB_CRAD "
+Go to manage-jenkins and select the Credentials, add the docker cradentials. **Note: Id = DOCKERHUB_CRAD "
 
 create a pipeline and paste the content.
 
