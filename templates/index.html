@@ -1,0 +1,98 @@
+{% extends 'base.html' %}
+{% block content %}
+<section class="hero" id="home">
+  <div class="hero-copy">
+    <p>Job-ready DevOps training with AWS and GenAI focus.</p>
+    <h1>Build your cloud career with hands-on DevOps training.</h1>
+    <p>
+      Learn Linux, Git, Terraform, Jenkins, Docker, Kubernetes, Prometheus, Grafana,
+      and GenAI-powered automation in a single practical training program.
+    </p>
+    <div class="hero-actions">
+      <a href="#enroll"><button class="primary">Enroll Now</button></a>
+      <a href="#courses"><button class="secondary">View Curriculum</button></a>
+    </div>
+  </div>
+  <div>
+    <div class="card">
+      <h2>Program Highlights</h2>
+      <p>3 months of guided instructor-led training, real-world labs, and an AI capstone project.</p>
+      <div class="badge">
+        <span>AWS</span>
+        <span>DevOps</span>
+        <span>GenAI</span>
+        <span>Hands-on</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="courses">
+  <h2>Curriculum</h2>
+  <div class="card-grid">
+    {% for course in courses %}
+    <article class="card">
+      <strong>{{ course.category }}</strong>
+      <h3>{{ course.title }}</h3>
+      <p>{{ course.description }}</p>
+      <div class="badge">
+        {% for tool in course.tools %}
+        <span>{{ tool }}</span>
+        {% endfor %}
+      </div>
+    </article>
+    {% endfor %}
+  </div>
+</section>
+
+<section class="section" id="roadmap">
+  <h2>Roadmap</h2>
+  <div class="timeline">
+    {% for stage in roadmap %}
+    <div class="timeline-item">
+      <h3>{{ stage.phase }}</h3>
+      <p><strong>{{ stage.title }}</strong></p>
+      <p>{{ stage.milestone }}</p>
+      <div class="badge">
+        {% for topic in stage.topics %}
+        <span>{{ topic }}</span>
+        {% endfor %}
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+</section>
+
+<section class="section" id="reviews">
+  <h2>Testimonials</h2>
+  <div class="card-grid">
+    {% for review in testimonials %}
+    <article class="testimonial">
+      <strong>{{ review.name }}</strong>
+      <p>{{ review.role }}</p>
+      <p>“{{ review.text }}”</p>
+      <p><strong>Rating:</strong> {{ review.rating }} / 5</p>
+    </article>
+    {% endfor %}
+  </div>
+</section>
+
+<section class="section" id="enroll">
+  <h2>Enroll Today</h2>
+  <p>Complete the form and we will contact you with enrollment details and schedule information.</p>
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      {% for category, message in messages %}
+      <div class="alert {{ category }}">{{ message }}</div>
+      {% endfor %}
+    {% endif %}
+  {% endwith %}
+  <form action="/apply" method="post" class="form-grid">
+    <input type="text" name="name" placeholder="Full name" required />
+    <input type="email" name="email" placeholder="Email address" required />
+    <input type="tel" name="phone" placeholder="Phone number" />
+    <textarea name="message" placeholder="Message or training goals" rows="5"></textarea>
+    <button type="submit" class="primary">Submit Enrollment Request</button>
+  </form>
+</section>
+{% endblock %}

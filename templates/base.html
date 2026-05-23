@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>DevOps Academy | Flask Training Portal</title>
+    <meta
+      name="description"
+      content="DevOps Academy Flask application with course curriculum, roadmap, testimonials, and enrollment form."
+    />
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+  </head>
+  <body>
+    <header>
+      <div class="screen">
+        <nav>
+          <a href="#home" class="brand">DevOps Academy</a>
+          <div class="nav-links">
+            <a href="#courses">Courses</a>
+            <a href="#roadmap">Roadmap</a>
+            <a href="#reviews">Testimonials</a>
+            <a href="#enroll">Enroll</a>
+          </div>
+        </nav>
+      </div>
+    </header>
+
+    <main class="screen">
+      {% block content %}{% endblock %}
+    </main>
+
+    <footer>
+      <div class="footer-grid">
+        <div>
+          <strong>Contact</strong>
+          <p>{{ contact.phone }}<br />{{ contact.email }}</p>
+        </div>
+        <div>
+          <strong>Location</strong>
+          <p>{{ contact.address }}</p>
+        </div>
+        <div>
+          <strong>Website</strong>
+          <p><a href="https://{{ contact.website }}">{{ contact.website }}</a></p>
+        </div>
+      </div>
+      <p>© 2026 DevOps Academy. Built with Flask.</p>
+    </footer>
+  </body>
+</html>

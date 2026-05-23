@@ -1,0 +1,30 @@
+[
+  {
+    "id": 1,
+    "name": "Arjun Kumar",
+    "role": "DevOps Engineer at TCS",
+    "rating": 5,
+    "text": "The hands-on projects and AI integration modules completely transformed my career. Got a 150% hike!"
+  },
+  {
+    "id": 2,
+    "name": "Priya Sharma",
+    "role": "Cloud Architect at Amazon",
+    "rating": 5,
+    "text": "Best DevOps training in Bengaluru. The BTM Layout classroom sessions are incredibly interactive and the trainers are top-notch."
+  },
+  {
+    "id": 3,
+    "name": "Rahul Verma",
+    "role": "SRE at Flipkart",
+    "rating": 4.5,
+    "text": "The curriculum is updated with the latest tools like LangChain and Kubernetes. Highly recommended for experienced professionals looking to upskill."
+  },
+  {
+    "id": 4,
+    "name": "Sneha Reddy",
+    "role": "Systems Engineer at Infosys",
+    "rating": 5,
+    "text": "The capstone project involving the AI-Powered Log Analyzer gave me the practical edge I needed in my interviews."
+  }
+]

@@ -1,0 +1,35 @@
+[
+  {
+    "phase": "Month 1",
+    "title": "Foundation & Cloud Architecture",
+    "topics": [
+      "Linux OS & Shell Scripting",
+      "Git Version Control",
+      "AWS Core Services (EC2, VPC, S3, IAM)",
+      "Infrastructure as Code (Terraform)"
+    ],
+    "milestone": "Deploying a highly available VPC architecture using Terraform."
+  },
+  {
+    "phase": "Month 2",
+    "title": "CI/CD & Containerization",
+    "topics": [
+      "Build Tools (Maven)",
+      "Jenkins Pipelines",
+      "Docker Containerization",
+      "Kubernetes Cluster Management"
+    ],
+    "milestone": "Automating microservices deployment to an EKS cluster via Jenkins."
+  },
+  {
+    "phase": "Month 3",
+    "title": "Monitoring, AI & Capstone",
+    "topics": [
+      "Prometheus & Grafana Setup",
+      "Log Management (ELK)",
+      "GenAI basics & LangChain",
+      "Capstone Project Execution"
+    ],
+    "milestone": "Building an AI-Powered Log Analyzer & Monitoring Chatbot."
+  }
+]
