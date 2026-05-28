@@ -69,10 +69,6 @@ create a pipeline and paste the content.
 pipeline {
   agent any
 
-  triggers {
-    githubPush()
-  }
-
   environment {
     IMAGE = "devops-site:"
   }
