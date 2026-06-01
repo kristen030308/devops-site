@@ -71,6 +71,7 @@ pipeline {
 
   environment {
     IMAGE = "devops-site:"
+    DOCKER_USER = "<docker-username>"
   }
 
   stages {
