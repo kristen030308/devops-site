@@ -21,7 +21,7 @@ testimonials = load_json("testimonials.json")
 contact = {
     "phone": "+91 97982-53860",
     "email": "info@devopsacademy.co",
-    "address": "BTM Layout, Bengaluru, Karnataka 560076",
+    "address": "BTM Layout 2nd stage, Bengaluru, Karnataka 560076",
     "website": "www.devopsacademy.co",
 }
 
