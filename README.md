@@ -152,6 +152,39 @@ Need to download:
 - [ ] Helm
 - [ ] EKSCTL
 
+
+Download:
+
+If you have Windows Subsystem for Linux (WSL) installed, you can use Linux commands to install eksctl, kubectl, and AWS CLI on your WSL environment. Here's how:
+
+1. Install eksctl on WSL
+```bash
+curl --silent --location "https://github.com/weaveworks/eksctl/releases/latest/download/eksctl_$(uname -s)_amd64.tar.gz" | tar xz -C /tmp
+sudo mv /tmp/eksctl /usr/local/bin
+```
+2. Install kubectl on WSL
+```bash
+curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+chmod +x kubectl
+sudo mv kubectl /usr/local/bin/
+```
+
+3. Install AWS CLI on WSL
+```bash
+curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+unzip awscliv2.zip
+sudo ./aws/install
+```
+
+Verify installations
+```bash
+eksctl version
+kubectl version --client
+aws --version
+```
+
+
+
 A. Create a IAM role with the policy 
 
 Managed Policy                           Purpose
@@ -261,47 +294,35 @@ module "eks" {
 
 Once apply finishes, connect to your cluster:
 
-> aws eks --region us-east-1 update-kubeconfig --name my-cluster
-
-> kubectl get nodes
-
 ** Note = if you create a any loadbalance please change into cluster ip and then apply the terraform destroy Why because terraform try to destroy but not successful in deleting lb because some dependecy on lb and it convert into infinite loop **
 
-# Optional 
-> how to create and access of the cluster with CLI command
-
 # Create access entry
-aws eks create-access-entry \
-    --cluster-name my-cluster \
-    --principal-arn arn:aws:iam::701201543425:user/eks \
-    --type STANDARD \
-    --username eks \
-    --region us-east-1
+aws eks list-access-entries \
+  --cluster-name my-cluster \
+  --region us-east-1
 
 # Attach admin policy
 aws eks associate-access-policy \
-    --cluster-name my-cluster \
-    --principal-arn arn:aws:iam::701201543425:user/eks \
-    --policy-arn arn:aws:eks::aws:cluster-access-policy/AmazonEKSClusterAdminPolicy \
-    --access-scope type=cluster \
-    --region us-east-1
+  --cluster-name my-cluster \
+  --principal-arn arn:aws:iam::701201543425:user/New-eks \
+  --policy-arn arn:aws:eks::aws:cluster-access-policy/AmazonEKSClusterAdminPolicy \
+  --access-scope type=cluster \
+  --region us-east-1
 
-# Connect kubectl
-aws eks update-kubeconfig --region us-east-1 --name my-cluster
+> kubectl get nodes
 
-# Verify
-kubectl get nodes
+
 
 ![alt text](image-1.png)
 
 9. Now we are creating a kubernetes deployment and service
 --------------------------------------------
-Create the deployment yaml file
+Create the deployment.yaml file
 ---------------------------------
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: devops-site deployment
+  name: devops-site-deployment
   namespace: default   # if you create a namespace please use that namespace here
   labels:
     app: devops-site    # this lable is very important please use this label in service yaml file
@@ -347,14 +368,13 @@ spec:
 --------------------------------------------------------
 
 > kubectl apply -f deployment.yaml
-> kubectl apply -f service.yaml
+
 
 > kubectl get all -n default or kubectl get all
 
 ![alt text](image-2.png)
 
 > kubectl port-forward service/devops-site-service 8080:80
-
 
 
 10. Monitoring tools ( prometheus and grafana)
@@ -364,47 +384,149 @@ we are installing the prometheus via the helm :
 
 > helm version
 
-> helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
-> helm repo update
-> helm install prometheus prometheus-community/kube-prometheus-stack -n monitoring --create-namespace
->
-> kubectl get all ns
-> kubectl get all -n monitoring 
+# Step 1 - Install Helm
+sudo snap install helm --classic
+
+# Step 2 - Verify
+helm version
+
+# Step 3 - Add Prometheus repo
+helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+
+# Step 4 - Update repos
+helm repo update
+
+# Step 5 - Install kube-prometheus-stack
+helm install prometheus prometheus-community/kube-prometheus-stack \
+  -n monitoring --create-namespace
+
+# Step 6 - Check everything in monitoring namespace
+kubectl get all -n monitoring
+
 
 Now modify the requirement.txt file
 
-add the content :
+Replace the content :
 
+Flask==2.3.3
 prometheus-client==0.21.0
 prometheus-flask-exporter==0.23.1
+gunicorn==22.0.0
 
-Now modify the app.py file 
+Now modify the app.py file ( Replace the content ) 
 
-from flask_prometheus_exporter import PrometheusMetrics
-
-metrics = PrometheusMetrics(app) # enble/metrics
-
-or whole file like :
+whole file like :
 
 --------------------------------------------
-from flask import Flask
+from pathlib import Path
+from flask import Flask, render_template, request, redirect, url_for, flash
 from prometheus_flask_exporter import PrometheusMetrics
+import json
+
+BASE_DIR = Path(__file__).resolve().parent
+DATA_DIR = BASE_DIR / "data"
 
 app = Flask(__name__)
-metrics = PrometheusMetrics(app)   # <-- enables /metrics
+app.config["SECRET_KEY"] = "replace-with-a-secure-secret"
+
+metrics = PrometheusMetrics.for_app_factory()
+metrics.init_app(app)
+metrics.info("app_info", "DevOps Academy App", version="1.0.0")
+
+
+def load_json(filename):
+    with open(DATA_DIR / filename, encoding="utf-8") as file:
+        return json.load(file)
+
+
+courses = load_json("courses.json")
+roadmap = load_json("roadmap.json")
+testimonials = load_json("testimonials.json")
+
+contact = {
+    "phone": "+91 97982-53860",
+    "email": "info@devopsacademy.co",
+    "address": "BTM Layout, Bengaluru, Karnataka 560076",
+    "website": "www.devopsacademy.co",
+}
+
 
 @app.route("/")
-def hello():
-    return "Hello World!"                   
+def home():
+    return render_template(
+        "index.html",
+        courses=courses,
+        roadmap=roadmap,
+        testimonials=testimonials,
+        contact=contact,
+    )
 
-@app.route("/new")
-def new():
-    return "FINAL CHECK"            
+
+@app.route("/apply", methods=["POST"])
+def apply():
+    name = request.form.get("name", "").strip()
+    email = request.form.get("email", "").strip()
+    phone = request.form.get("phone", "").strip()
+    message = request.form.get("message", "").strip()
+
+    if not name or not email:
+        flash("Name and email are required. Please complete the form.", "error")
+        return redirect(url_for("home") + "#enroll")
+
+    flash("Thank you! Your enrollment request has been received.", "success")
+    app.logger.info("Enrollment request: %s, %s, %s, %s", name, email, phone, message)
+    return redirect(url_for("home") + "#enroll")
+
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000)
-
+    app.run(host="0.0.0.0", port=5000, debug=True, use_reloader=False)
 -----------------------------------------------------------
+Next Steps
+
+add or change the docker-file:
+
+FROM python:3.11-slim
+
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    FLASK_DEBUG=0
+
+WORKDIR /app
+
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+COPY app.py .
+COPY data/ data/
+COPY static/ static/
+COPY templates/ templates/
+
+EXPOSE 5000
+
+CMD ["gunicorn", "--bind", "0.0.0.0:5000", "--workers", "2", "app:app"]
+
+---------------------------------------------------------------------
+After updating these files, rebuild and push your Docker image:
+
+docker build -t devoopsguru/hello:<new-tag> .
+docker push devoopsguru/hello:<new-tag>
+
+# Step 1 - Update deployment with new image via terminal	
+kubectl set image deployment/devops-site-deployment devops-site-flask-app=devopsplan1999/devops-site:v3
+
+# Step 2 - Watch rollout
+kubectl rollout status deployment/devops-site-deployment
+
+# Step 3 - Verify pods are running
+kubectl get pods
+
+Then test the /metrics endpoint:
+
+# Step 4 - Port forward
+kubectl port-forward svc/devops-site-service 8080:80
+
+# Step 5 - In a NEW terminal, test metrics
+curl http://localhost:8080/metrics
 
 http://[IP_ADDRESS]/metrics --> prometheus 
 
@@ -422,19 +544,20 @@ create the servicemonitor.yaml file
 apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
-  name: hello-service
+  name: devops-site-servicemonitor
   namespace: monitoring
   labels:
-    release: prometheus
+    release: prometheus        # must match your Prometheus operator label selector
 spec:
   selector:
     matchLabels:
-      app: hello
+      app: devops-site         # must match your service label
+      release: prometheus      # must match your service label
   namespaceSelector:
     matchNames:
-      - default 
+      - default
   endpoints:
-  - port: http
+  - port: http                 # must match port name in service.yaml
     path: /metrics
     interval: 15s
 
@@ -443,11 +566,12 @@ spec:
 > kubectl apply -f servicemonitor.yaml
 > kubectl get all -n monitoring
 
-> kubectl prot-forward -n monitoring svc/prometheus-kube-prometheus-prometheus 9090:9090
+> kubectl port-forward -n monitoring svc/prometheus-kube-prometheus-prometheus 9090:9090
 >
 > Now go to url and click on status >> target health
 
-
+> enter the quarry : {job="devops-site-service"} and execute. 
+> Also try : app_info
 
 Grafana Dashboard
 ----------------------------------------
