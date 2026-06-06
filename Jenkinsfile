@@ -11,7 +11,7 @@ pipeline {
     stage('Checkout') {
       steps {
         git branch: 'main',
-            url: 'https://github.com/Devopsplan/devops-site-end-to-end.git'
+            url: 'https://github.com/kristen030308/devops-site.git'
       }
     }
 
