@@ -3,7 +3,7 @@ pipeline {
 
   environment {
     IMAGE = "devops-site:"
-    DOCKER_USER = "<docker-username>"
+    DOCKER_USER = "kristen08"
   }
 
   stages {
