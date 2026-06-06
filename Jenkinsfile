@@ -2,7 +2,7 @@ pipeline {
   agent any
 
   environment {
-    IMAGE = "devops-site"
+    IMAGE = "devops"
     DOCKER_USER = "kristen08"
   }
 
